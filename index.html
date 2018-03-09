@@ -1,0 +1,72 @@
+<html>
+  <head>
+    <title>Generar etiquetas</title>
+    <link rel="stylesheet" type="text/css" href="etiquetas.css" >
+    <meta charset="utf-8" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+      var referencias = [];
+      $(document).ready(function(){
+          $('#filtros').load("php/filtros.php", {filtros: true});
+
+          $("#b1").click(function(){
+            if (referencias.length < 9) {
+              if ($("input:text").val()!="") {
+                referencias.push($("input:text").val());
+                separar = referencias.join(",");
+              }
+              $('#imprimir').load("php/form.php", {pedirEtiquetas: separar});
+              $("input:text").val("");
+            }
+          });
+
+          $("#b2").click(function(){
+            if (document.getElementById('imprimir').innerHTML != "") {
+              var prtContent = document.getElementById('imprimir');
+              var WinPrint = window.open('', '', 'left=0,top=0,width=1240,height=900,toolbar=0,scrollbars=0,status=0');
+              WinPrint.document.write('<link rel="stylesheet" type="text/css" href="etiquetas.css" >');
+              WinPrint.document.write(prtContent.innerHTML);
+              WinPrint.document.close();
+              WinPrint.focus();
+              WinPrint.print();
+              WinPrint.close();
+            } else {
+              alert("No has introducido ninguna referencia.");
+            }
+          });
+
+          $("aside").on('click','producto', function(){
+            if(referencias.length < 9) {
+              referencias.push(this.childNodes[0].innerHTML);
+              separar = referencias.join(",");
+              $('#imprimir').load("php/form.php", {pedirEtiquetas: separar});
+            }
+          });
+
+          $("imprimir").on('contextmenu','etiquetas > etiqueta', function(){
+            var indice = referencias.indexOf(this.childNodes[3].innerHTML);
+            referencias.splice(indice,1);
+            separar = referencias.join(",");
+            $('#imprimir').load("php/form.php", {pedirEtiquetas: separar});
+          });
+      });
+    </script>
+  </head>
+  <body>
+    <header>
+      <img src="img/bcnled.png" alt="bcnled.png" id="logo" />
+      <interfaz>
+        Referencia: <input type = "text" name="referencia" id="referencia" value="">
+        <button id="b1">Añadir</button>
+        <button id="b2">Imprimir</button>
+      </interfaz>
+      <instrucciones>
+        <p>Introduce una referencia en el campo de texto y presiona Añadir o busca en los filtros y selecciona el producto.</p>
+        <p>Para eliminar una etiqueta haz click derecho sobre ella.</p>
+      </instrucciones>
+    </header>
+    <aside id="filtros">
+    </aside>
+    <imprimir id="imprimir"></imprimir>
+  </body>
+</html>
